@@ -1,0 +1,44 @@
+2026-06-11 18:32:09 INFO  p.u.e.service.EventoSistemaService - Inicio del sistema de estacionamiento
+2026-06-11 18:32:09 ERROR p.u.e.service.EventoSistemaService - Error de conexion con la base de datos
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:861)
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:449)
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:234)
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180)
+	at java.sql/java.sql.DriverManager.getConnection(Unknown Source)
+	at java.sql/java.sql.DriverManager.getConnection(Unknown Source)
+	at pe.utp.estacionamiento.config.DatabaseConfig.getConnection(DatabaseConfig.java:15)
+	at pe.utp.estacionamiento.repository.VehiculoRepository.listarVehiculosParaReporte(VehiculoRepository.java:36)
+	at pe.utp.estacionamiento.App.exportarReporte(App.java:38)
+	at pe.utp.estacionamiento.App.main(App.java:24)
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(Unknown Source)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source)
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140)
+	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156)
+	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:79)
+	at com.mysql.cj.NativeSession.connect(NativeSession.java:139)
+	at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:980)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:851)
+	... 9 common frames omitted
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Unknown Source)
+	at java.base/sun.nio.ch.Net.connect(Unknown Source)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(Unknown Source)
+	at java.base/java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.base/java.net.Socket.connect(Unknown Source)
+	at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:144)
+	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53)
+	... 12 common frames omitted
+2026-06-11 18:33:26 INFO  p.u.e.service.EventoSistemaService - Inicio del sistema de estacionamiento
+2026-06-11 18:33:28 INFO  p.u.e.service.ReporteExcelService - Reporte Excel generado correctamente en C:\xampp\htdocs\estacionamiento-utp\reportes\reporte_estacionamiento.xlsx

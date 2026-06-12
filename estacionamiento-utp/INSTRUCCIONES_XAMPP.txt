@@ -1,0 +1,42 @@
+PASOS PARA USAR LA APP CON XAMPP, MYSQL Y PHPMYADMIN
+
+1. Copia toda la carpeta del proyecto dentro de:
+   C:\xampp\htdocs\estacionamiento-utp
+
+2. Abre XAMPP Control Panel.
+
+3. Inicia estos servicios:
+   - Apache
+   - MySQL
+
+4. Abre phpMyAdmin:
+   http://localhost/phpmyadmin
+
+5. En phpMyAdmin entra a la pestana Importar.
+
+6. Selecciona este archivo del proyecto:
+   database.sql
+
+7. Presiona Importar.
+
+8. Abre la app desde:
+   http://localhost/estacionamiento-utp/
+
+9. Inicia sesion con:
+   Usuario: u22210840
+   Contrasena: 123456
+
+CONFIGURACION DE MYSQL:
+
+El usuario y contrasena de MySQL se configuran en:
+api/config.php
+
+Valores por defecto de XAMPP:
+usuario: root
+contrasena: vacia
+
+IMPORTANTE:
+- Esta version debe abrirse desde Apache/XAMPP, no desde Live Server.
+- Las contrasenas de usuarios se guardan con password_hash.
+- El frontend valida datos, pero PHP vuelve a validarlos antes de guardar.
+- Si vuelves a importar database.sql, se borraran los datos anteriores y se creara todo desde cero.
