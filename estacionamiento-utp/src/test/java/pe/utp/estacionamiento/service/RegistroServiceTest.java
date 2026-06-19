@@ -25,6 +25,7 @@ class RegistroServiceTest {
         registroService.registrarVehiculo("ABC123", "u22210840");
 
         verify(repository, times(1)).save(any(Vehiculo.class));
+        System.out.println("✅ CP03 - Registrar Vehículo: Registro exitoso para la placa ABC123.");
     }
     
     @Test
@@ -34,5 +35,6 @@ class RegistroServiceTest {
         });
 
         assertEquals("Placa invalida", exception.getMessage());
+        System.out.println("✅ Validación - Registro Vehículo: Intento bloqueado correctamente por placa inválida.");
     }
 }

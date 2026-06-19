@@ -31,6 +31,7 @@ class AuthServiceTest {
         assertNotNull(user);
         assertEquals("u22210840", user.getCodigo());
         verify(usuarioRepository, times(1)).findByCodigo("u22210840");
+        System.out.println("✅ CP01 - Login Correcto: ¡Hola, Bienvenido al sistema " + user.getCodigo() + "!");
     }
 
     // CP02: Login incorrecto
@@ -44,6 +45,7 @@ class AuthServiceTest {
         });
 
         assertEquals("Credenciales invalidas", exception.getMessage());
+        System.out.println("✅ CP02 - Login Incorrecto: Acceso denegado por contraseña errónea.");
     }
 
     // CP08: Validacion de roles
@@ -54,5 +56,6 @@ class AuthServiceTest {
 
         assertTrue(authService.esAdministrador(admin), "Deberia ser Administrador");
         assertFalse(authService.esAdministrador(estudiante), "No deberia ser Administrador");
+        System.out.println("✅ CP08 - Validación de Roles: Administrador tiene acceso, estudiante no.");
     }
 }

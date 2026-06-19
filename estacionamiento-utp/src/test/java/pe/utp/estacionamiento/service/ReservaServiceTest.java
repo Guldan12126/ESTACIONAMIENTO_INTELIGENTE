@@ -40,6 +40,7 @@ class ReservaServiceTest {
         assertTrue(espacioLibre.isOcupado());
         verify(espacioRepository, times(1)).update(espacioLibre);
         verify(reservaRepository, times(1)).save(any(Reserva.class));
+        System.out.println("✅ CP04 - Reservar Espacio: Reserva creada con éxito en el espacio A1.");
     }
 
     // CP05: Reserva duplicada
@@ -53,6 +54,7 @@ class ReservaServiceTest {
         });
 
         assertEquals("El usuario ya tiene una reserva activa", exception.getMessage());
+        System.out.println("✅ CP05 - Reserva Duplicada: Bloqueo exitoso. El usuario ya tenía una reserva activa.");
     }
 
     // CP06: Consultar espacios
@@ -65,5 +67,6 @@ class ReservaServiceTest {
 
         assertEquals(2, disponibles.size());
         verify(espacioRepository, times(1)).findAllLibres();
+        System.out.println("✅ CP06 - Consultar Espacios: Listado de espacios libres mostrado (Total: " + disponibles.size() + ").");
     }
 }

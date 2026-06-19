@@ -16,5 +16,6 @@ class NotificacionServiceTest {
 
         assertTrue(notificacionService.notificarReservaVencida(reservaVencida));
         assertFalse(notificacionService.notificarReservaVencida(reservaVigente));
+        System.out.println("✅ CP07 - Notificación: Se verificó el envío correcto de la notificación de reserva vencida.");
     }
 }
