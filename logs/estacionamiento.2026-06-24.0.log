@@ -1,0 +1,2 @@
+2026-06-24 21:33:02 INFO  p.u.e.service.EventoSistemaService - Inicio del sistema de estacionamiento
+2026-06-24 21:33:03 INFO  p.u.e.service.ReporteExcelService - Reporte Excel generado correctamente en C:\xampp\htdocs\estacionamiento-utp\reportes\reporte_estacionamiento.xlsx
