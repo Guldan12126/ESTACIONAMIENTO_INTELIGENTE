@@ -131,7 +131,8 @@ def click_event(event, x, y, flags, param):
         redibujar()
 
 
-cv2.namedWindow("Calibrador de espacios")
+cv2.namedWindow("Calibrador de espacios", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("Calibrador de espacios", 1280, 720)
 cv2.setMouseCallback("Calibrador de espacios", click_event)
 redibujar()
 
