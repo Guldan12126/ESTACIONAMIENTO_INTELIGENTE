@@ -1,0 +1,466 @@
+﻿<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monitoreo - Estacionamiento UTP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --warning-color: #f59e0b;
+            --dark-bg: #0f172a;
+            --card-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #eef2f8 100%);
+            color: #172033;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .topbar {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .topbar h1 { font-weight: 700; letter-spacing: 0.5px; }
+        .topbar .subtitle { font-size: 0.9rem; color: #d1d5db; }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .metric-card {
+            border: 0;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(15, 23, 42, .12);
+        }
+        
+        .metric-card.status-up { border-left: 4px solid var(--success-color); }
+        .metric-card.status-down { border-left: 4px solid var(--danger-color); }
+        .metric-card.status-warn { border-left: 4px solid var(--warning-color); }
+        
+        .metric-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 12px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .metric-value.error { color: var(--danger-color); }
+        .metric-value.warning { color: var(--warning-color); }
+        .metric-value.success { color: var(--success-color); }
+        
+        .metric-subtext {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.up { background: var(--success-color); }
+        .status-dot.down { background: var(--danger-color); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #172033;
+            margin: 24px 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .log-box {
+            background: var(--dark-bg);
+            color: #dbeafe;
+            border-radius: 8px;
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        
+        .log-box .log-info { color: #4ade80; }
+        .log-box .log-warn { color: #fbbf24; }
+        .log-box .log-error { color: #f87171; }
+        .log-box .log-debug { color: #93c5fd; }
+        
+        .progress { height: 12px; border-radius: 6px; }
+        .progress-bar { background: linear-gradient(90deg, var(--primary-color), #0066ff); }
+        
+        .btn-quick-link {
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 102, 204, 0.2);
+        }
+        
+        .badge-metric {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .badge-metric.online { background: #d1fae5; color: #065f46; }
+        .badge-metric.offline { background: #fee2e2; color: #7f1d1d; }
+        .badge-metric.warning { background: #fef3c7; color: #78350f; }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .info-box code {
+            background: var(--dark-bg);
+            color: #dbeafe;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .loading { animation: shimmer 2s infinite; }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .last-update {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 16px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .metric-value { font-size: 2rem; }
+            .topbar h1 { font-size: 1.25rem; }
+            .section-title { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOPBAR -->
+    <header class="topbar py-3">
+        <div class="container-fluid px-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="mb-1"><i class="bi bi-speedometer2"></i> Dashboard de Monitoreo</h1>
+                    <p class="subtitle mb-0">Sistema de Estacionamiento UTP v1.0.0</p>
+                </div>
+                <div class="col-md-6 text-md-end text-start mt-2 mt-md-0">
+                    <div class="status-indicator">
+                        <span th:class="'status-dot ' + (${snapshot.disponible} ? 'up' : 'down')"></span>
+                        <strong th:text="${snapshot.estadoSistema}">UP</strong>
+                        <span class="ms-2">|</span>
+                        <span class="ms-2 text-white-50" th:text="${#temporals.format(snapshot.actualizadoEn, 'dd/MM HH:mm:ss')}">12/01 14:30:45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4">
+        <!-- SECCIÓN 1: ESTADO GENERAL -->
+        <div class="section-title"><i class="bi bi-heart-pulse"></i> Estado General del Sistema</div>
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div th:class="'card metric-card status-' + (${snapshot.disponible} ? 'up' : 'down')">
+                    <div class="card-body">
+                        <div class="metric-label"><i class="bi bi-cloud-check"></i> Disponibilidad</div>
+                        <div th:class="'metric-value ' + (${snapshot.disponible} ? 'success' : 'error')" 
+                             th:text="${snapshot.disponible} ? 'ONLINE' : 'OFFLINE'">ONLINE</div>
+                        <div class="badge badge-metric" 
+                             th:classappend="${snapshot.disponible} ? 'online' : 'offline'"
+                             th:text="${snapshot.disponible} ? 'Servicio disponible' : 'Revisar base de datos'">Disponible</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="metric-label"><i class="bi bi-cpu"></i> Uso de CPU</div>
+                        <div class="metric-value" th:text="${snapshot.cpuPorcentaje}">45</div>
+                        <div class="progress">
+                            <div class="progress-bar" th:style="'width:' + ${snapshot.cpuPorcentaje} + '%'"></div>
+                        </div>
+                        <div class="metric-subtext" th:text="'Carga del proceso Java'">Información del sistema</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="metric-label"><i class="bi bi-memory"></i> Memoria RAM</div>
+                        <div class="metric-value"><span th:text="${snapshot.ramUsadaMb}">256</span><span style="font-size:1.2rem">/</span><span th:text="${snapshot.ramTotalMb}" style="font-size:1.8rem">1024</span></div>
+                        <div class="progress" style="margin-bottom: 8px;">
+                            <div class="progress-bar" th:style="'width:' + ${(snapshot.ramUsadaMb * 100 / snapshot.ramTotalMb)} + '%'"></div>
+                        </div>
+                        <div class="metric-subtext" th:text="${#numbers.formatDecimal((snapshot.ramUsadaMb * 100 / snapshot.ramTotalMb), 1, 1)} + '% utilizado'">Uso</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="metric-label"><i class="bi bi-hourglass-split"></i> Tiempo de Respuesta</div>
+                        <div class="metric-value" th:text="${snapshot.tiempoRespuestaMs}">12</div>
+                        <div class="badge badge-metric" style="background: #dbeafe; color: #0c4a6e;">ms</div>
+                        <div class="metric-subtext">Consulta del dashboard</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: MÉTRICAS DEL NEGOCIO -->
+        <div class="section-title"><i class="bi bi-building"></i> Métricas del Estacionamiento</div>
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Usuarios Activos</div>
+                        <div class="metric-value text-primary" th:text="${snapshot.usuariosActivos}">4</div>
+                        <i class="bi bi-people" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Vehículos Registrados</div>
+                        <div class="metric-value text-primary" th:text="${snapshot.vehiculosRegistrados}">12</div>
+                        <i class="bi bi-car-front" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Espacios Disponibles</div>
+                        <div class="metric-value text-success" th:text="${snapshot.espaciosDisponibles}">8</div>
+                        <i class="bi bi-p-square-fill" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Reservas Activas</div>
+                        <div class="metric-value text-warning" th:text="${snapshot.reservasActivas}">3</div>
+                        <i class="bi bi-calendar-check" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Pagos Realizados</div>
+                        <div class="metric-value text-info" th:text="${snapshot.pagosRealizados}">5</div>
+                        <i class="bi bi-cash-coin" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                <div class="card metric-card status-warn">
+                    <div class="card-body text-center">
+                        <div class="metric-label">Errores / Advertencias</div>
+                        <div><span class="metric-value error" th:text="${snapshot.erroresRegistrados}">0</span><span class="metric-value warning" style="font-size:1.8rem">/ </span><span class="metric-value warning" th:text="${snapshot.advertenciasRegistradas}">0</span></div>
+                        <i class="bi bi-exclamation-triangle" style="font-size: 1.5rem; color: #64748b;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: ACCESOS RÁPIDOS A ENDPOINTS -->
+        <div class="section-title"><i class="bi bi-link-45deg"></i> Accesos Rápidos a Endpoints de Actuator</div>
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-xl-8">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-primary w-100" href="/actuator" target="_blank"><i class="bi bi-arrow-up-right"></i> /actuator</a></div>
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-success w-100" href="/actuator/health" target="_blank"><i class="bi bi-heart-pulse"></i> Health</a></div>
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-info w-100" href="/actuator/info" target="_blank"><i class="bi bi-info-circle"></i> Info</a></div>
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-warning w-100" href="/actuator/metrics" target="_blank"><i class="bi bi-graph-up"></i> Métricas</a></div>
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-secondary w-100" href="/actuator/env" target="_blank"><i class="bi bi-sliders"></i> Entorno</a></div>
+                            <div class="col-12 col-md-4"><a class="btn btn-quick-link btn-secondary w-100" href="/actuator/beans" target="_blank"><i class="bi bi-boxes"></i> Beans</a></div>
+                            <div class="col-12 col-md-6"><a class="btn btn-quick-link btn-danger w-100" href="/actuator/prometheus" target="_blank"><i class="bi bi-fire"></i> Prometheus</a></div>
+                            <div class="col-12 col-md-6"><a class="btn btn-quick-link btn-dark w-100" href="/monitoring/demo-logs" target="_blank"><i class="bi bi-play-circle"></i> Generar Logs Demo</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-info-square"></i> Información</h5>
+                        <p class="small text-muted mb-2">Spring Boot Actuator proporciona endpoints HTTP para monitoreo y auditoría de tu aplicación.</p>
+                        <div class="info-box">
+                            <strong>Haz clic en cualquier botón para ver el endpoint</strong><br>
+                            <small>Se abrirá en una nueva pestaña</small>
+                        </div>
+                        <p class="small text-muted">Para capturas de pantalla, abre cada endpoint en una pestaña nueva.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: PROMETHEUS Y GRAFANA -->
+        <div class="section-title"><i class="bi bi-graph-up-arrow"></i> Integración con Prometheus y Grafana</div>
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-lg-6">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-fire"></i> Prometheus</h5>
+                        <p class="small text-muted mb-3">Métricas personalizadas disponibles en formato Prometheus:</p>
+                        <div class="info-box">
+                            <code>estacionamiento_usuarios_activos</code><br>
+                            <code>estacionamiento_vehiculos_registrados</code><br>
+                            <code>estacionamiento_espacios_disponibles</code><br>
+                            <code>estacionamiento_reservas_activas</code><br>
+                            <code>estacionamiento_pagos_realizados</code><br>
+                            <code>estacionamiento_errores_registrados</code>
+                        </div>
+                        <a class="btn btn-sm btn-outline-danger mt-3" href="/actuator/prometheus" target="_blank">
+                            <i class="bi bi-fire"></i> Ver todas las métricas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-graph-up"></i> Grafana</h5>
+                        <p class="small text-muted mb-3">Para visualizar gráficos avanzados, configura Grafana:</p>
+                        <div class="info-box">
+                            <strong>Data Source:</strong> <code>http://localhost:8080/actuator/prometheus</code><br><br>
+                            <strong>Dashboard:</strong> Crea dashboards con las métricas personalizadas
+                        </div>
+                        <p class="small text-muted mt-3"><i class="bi bi-info-circle"></i> Consulta el archivo <code>docker-compose.monitoring.yml</code> para configuración completa de Prometheus y Grafana.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: ÚLTIMOS LOGS -->
+        <div class="section-title"><i class="bi bi-terminal"></i> Últimos Logs del Sistema (Últimas 10 líneas)</div>
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="log-box p-3">
+                            <div th:if="${snapshot.ultimosLogs.isEmpty()}">
+                                <span class="log-info">INFO  No hay logs registrados aún. Haz clic en "Generar Logs Demo" para crear logs de ejemplo.</span>
+                            </div>
+                            <div th:each="line : ${snapshot.ultimosLogs}"
+                                th:class="${#strings.contains(line, ' INFO ')} ? 'log-info' : 
+                                        (${#strings.contains(line, ' WARN ')} ? 'log-warn' : 
+                                        (${#strings.contains(line, ' ERROR ')} ? 'log-error' : 'log-debug'))"
+                                th:text="${line}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="last-update">
+            <p class="mb-0"><small><i class="bi bi-arrow-clockwise"></i> Dashboard actualizado: <span th:text="${#temporals.format(snapshot.actualizadoEn, 'dd/MM/yyyy HH:mm:ss')}">12/01/2024 14:30:45</span></small></p>
+            <p class="mb-0"><small><strong>Para ver cambios en vivo:</strong> Abre la consola del servidor (PowerShell) para ver logs en tiempo real</small></p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh del dashboard cada 10 segundos
+        function autoRefresh() {
+            fetch('/api/monitoring')
+                .then(response => response.json())
+                .then(data => {
+                    // En una versión más avanzada, actualizaríamos los valores sin recargar
+                    // Por ahora, el usuario puede recargar manualmente con F5
+                })
+                .catch(error => console.error('Error actualizando:', error));
+        }
+        
+        // Comentado para no causar molestias, descomenta si necesitas auto-refresh:
+        // setInterval(autoRefresh, 10000);
+        
+        // Información en consola
+        console.log('%c Sistema de Estacionamiento UTP - Dashboard de Monitoreo', 
+                    'color: #0066cc; font-size: 16px; font-weight: bold;');
+        console.log('%c Para ver logs en tiempo real, abre la consola del servidor (PowerShell)', 
+                    'color: #64748b; font-size: 12px;');
+    </script>
+</body>
+</html>
+
